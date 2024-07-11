@@ -1,6 +1,6 @@
 <template>
     <section>
-        <TopoPaginaPrincipal />
+        <!-- <TopoPaginaPrincipal /> -->
         <!-- <MostragemProdutosPrincipal /> -->
         <ProdutosDisponiveis />
     </section>

@@ -18,3 +18,14 @@ Route::get('/', function () {
 });
 
 Route::POST('/usuario/save', 'UsuarioController@cadastraUsuario');
+Route::prefix('/produto')->group(function(){
+    Route::GET('/get-produtos', 'ProdutoController@getProdutos')->middleware('cors');
+    Route::GET('/get-produto-detalhe/{rotuloUnico}', 'ProdutoController@getProdutoDetalhe')->middleware('cors');
+    Route::POST('/save', 'ProdutoController@addProduto')->middleware('cors');
+});
+
+Route::prefix('/local')->group(function(){
+    Route::GET('/get-ufs', 'LocalController@getUfs')->middleware('cors');
+    Route::GET('/get-cidade-by-uf/{uf}', 'LocalController@getCidadeByUf')->middleware('cors');
+    Route::GET('/get-endereco-by-cep/{cep}', 'LocalController@getEnderecoByCep')->middleware('cors');
+});

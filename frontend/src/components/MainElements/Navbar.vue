@@ -70,9 +70,9 @@
                         {{usuario}} &nbsp; <v-icon icon="mdi-account-circle"></v-icon>
                     </v-btn>
                 </RouterLink>
-                <v-btn @click="$router.push('/entrar/criarConta')" color="teal" v-show="!logado" variant="flat" class="mr-4 ml-4 text-none">Criar Conta &nbsp; <v-icon icon="mdi-account-circle"></v-icon></v-btn>
+                <!-- <v-btn @click="$router.push('/entrar/criarConta')" color="teal" v-show="!logado" variant="flat" class="mr-4 ml-4 text-none"></v-btn> -->
                 <v-divider v-show="!logado" vertical></v-divider>
-                <v-btn @click="$router.push('/entrar/fazerLogin')" color="blue" v-show="!logado" variant="flat" class="ml-4 mr-6 text-none">Entrar &nbsp; <v-icon icon="mdi-login"></v-icon></v-btn>
+                <v-btn @click="$router.push('/entrar/fazerLogin')" color="blue" v-show="!logado" variant="flat" class="ml-4 mr-6 text-none"><v-icon icon="mdi-login"></v-icon></v-btn>
             </section>
         </v-app-bar>
         <v-navigation-drawer

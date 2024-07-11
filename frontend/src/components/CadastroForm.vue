@@ -1,7 +1,7 @@
 <template>
     <div class="px-6 py-6">
         <v-form v-model="formValido" @submit.prevent="criarConta">
-            <v-stepper :items="stepper" elevation="0">
+            <v-stepper :items="stepper" elevation="0" complete-icon="mdi-close" next-text="Próximo" prev-text="Voltar" :non-linear="true" theme="amber">
                 <template v-slot:item.1>
                     <v-row class="d-flex justify-center"> <!-- nome e sobrenome -->
                         <v-col md="6" lg="6" sm="12" xs="12">
@@ -30,6 +30,7 @@
                                 label="Data de Nascimento"
                                 v-model="usuario.data_nascimento"
                                 placeholder="01/04/1992"
+                                maxlength="10"
                                 >
                             </v-text-field>
                         </v-col>
@@ -49,7 +50,8 @@
                                 variant="solo" 
                                 label="Telefone"
                                 v-model="usuario.telefone"
-                                placeholder="(47) 99675-4112"
+                                maxlength="15"
+                                placeholder="(47) 91111-1111"
                                 >
                             </v-text-field>
                         </v-col>
@@ -88,6 +90,7 @@
                                 variant="solo" 
                                 label="CEP"
                                 v-model="usuario.cep_pessoal"
+                                @blur="consultaCep"
                                 :mask="'##-##'"
                                 placeholder="00000-000"
                                 maxlength="9"
@@ -106,25 +109,35 @@
                     </v-row>
                     <v-row> <!-- UF e Cidade -->
                         <v-col md="3" lg="3" sm="6" xs="6">
-                            <v-select
+                            <v-autocomplete
                                 v-model="usuario.uf_pessoal"
+                                :loading="loadingUfs"
                                 :items="ufs"
+                                item-value="sigla"
+                                item-title="sigla"
                                 label="UF"
+                                maxlength="2"
+                                @update:modelValue="getCidades"
+                                no-data-text="Nenhuma UF encontrada."
                                 :append-inner-icon="(usuario.uf_pessoal ? 'mdi-close' : '')"
                                 @click:append-inner="usuario.uf_pessoal = null; usuario.cidade_pessoal = null"
                                 >
-                            </v-select>
+                            </v-autocomplete>
                         </v-col>
                         <v-col md="7" lg="7" sm="6" xs="6">
-                            <v-select
+                            <v-autocomplete
                                 v-model="usuario.cidade_pessoal"
-                                :items="municipios"
+                                :items="cidades"
                                 label="Cidade"
+                                item-value="nome"
+                                item-title="nome"
+                                :loading="loadingCidades"
+                                no-data-text="Nenhuma cidade encontrada."
                                 :disabled="!usuario.uf_pessoal"
                                 :append-inner-icon="(usuario.cidade_pessoal ? 'mdi-close' : '')"
                                 @click:append-inner="usuario.cidade_pessoal = null"
                                 >
-                            </v-select>
+                            </v-autocomplete>
                         </v-col>
                     </v-row>
                     <v-row> <!-- Bairro e complemeto -->
@@ -156,7 +169,11 @@
     </div>
 </template>
 <script>
+import LocalService from '../services/LocalService';
 export default {
+    mounted() {
+        this.getUfs()
+    },
     data() {
         return{
             formValido: false,
@@ -171,19 +188,21 @@ export default {
                 cep_pessoal: '',
                 uf_pessoal: '',
                 cidade_pessoal: '',
+                bairro_pessoal: '',
+                logradouro_pessoal: '',
                 senha: ''
             },
             stepper: ['Informações Pessoais e de Contato', 'Endereço', 'OK'],
-            ufs: [
-                'SC', 'SP', 'MG'
-            ],
-            municipios: [
-                'Joinville - SC', 'São Paulo - SP', 'São José do Vale do Rio Preto - RJ'
-            ],
+            ufs: [],
+            ufSelecionada: {},
+            cidades: [],
             senha: '',
             senhaRepete: '',
             mostraSenhaRepete: false,
-            mostraSenha: false
+            mostraSenha: false,
+            loadingUfs: false,
+            loadingCidades: false,
+            loading: false
         }
     },
     methods: {
@@ -192,6 +211,30 @@ export default {
         },
         setUsuarioNome() {
             this.usuario.nome = this.usuarioNome + ' ' + this.usuarioSobrenome
+        },
+        async getUfs() {
+            this.loadingUfs = true
+            const response = await LocalService.getUfs()
+            this.ufs = response.data
+            this.loadingUfs = false
+        },
+        async getCidades(){
+            this.loadingCidades = true
+            const response = await LocalService.getCidadeByUf(this.usuario.uf_pessoal)
+            this.cidades = response.data
+            this.loadingCidades = false
+        },
+        async consultaCep(){
+            this.loading = true
+            const response = await LocalService.getEnderecoByCep(this.usuario.cep_pessoal)
+            this.usuario.cidade_pessoal = response.data.localidade
+            this.usuario.logradouro_pessoal = response.data.logradouro
+            this.usuario.uf_pessoal = response.data.uf
+            this.usuario.bairro_pessoal = response.data.bairro
+            this.usuario.complemento_pessoal = response.data.complemento
+            this.getUfs()
+            this.getCidades()
+            this.loading = false
         }
     }
 }

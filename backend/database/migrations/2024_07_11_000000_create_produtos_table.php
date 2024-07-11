@@ -18,8 +18,8 @@ class CreateProdutosTable extends Migration
             $table->string('titulo', 100);
             $table->decimal('preco', 8, 2);
             $table->string('descricao', 300);
-            $table->integer('quantidadeEmEstoque');
-            $table->string('rotuloUnico', 100)->unique(); // utilizado pra criar URLs amigáveis
+            $table->integer('quantidade_em_estoque');
+            $table->string('rotulo_unico', 100)->unique(); // utilizado pra criar URLs amigáveis
             $table->unsignedBigInteger('tipo_produto_id');
             $table->timestamps();
             // todos os campos são obrigatórios pois contém a informação mínima para o produto ser cadastrado ou a compra ser realizada
